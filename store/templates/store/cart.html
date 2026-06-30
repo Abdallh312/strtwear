@@ -1,0 +1,61 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Your Cart - PYRO{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto; padding-top: 2rem;">
+    <h1 style="font-size: 2.5rem; margin-bottom: 2rem;">Your Cart</h1>
+
+    {% if cart_items %}
+        <div style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 3rem;">
+            {% for item in cart_items %}
+            <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color);">
+                <div style="display: flex; gap: 1.5rem; align-items: center;">
+                    <div style="width: 80px; height: 80px; background: #27272A; border-radius: 4px;"></div>
+                    <div>
+                        <h3 style="font-size: 1.25rem;">{{ item.product.title }}</h3>
+                        <p class="text-secondary">Quantity: {{ item.quantity }} &times; ${{ item.price|floatformat:2 }}</p>
+                    </div>
+                </div>
+                <div style="font-size: 1.25rem; font-weight: bold;">
+                    ${{ item.item_total|floatformat:2 }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div style="background: var(--bg-surface); padding: 2rem; border-radius: 8px; border: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem;">
+                <span>Total:</span>
+                <span>${{ total_value|floatformat:2 }}</span>
+            </div>
+            
+            {% if role == 'WHOLESALE' %}
+                <div style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color);">
+                    <p class="text-secondary mb-2"><strong>Wholesale Summary:</strong></p>
+                    <p class="text-secondary">Total Quantity: {{ total_quantity }} units</p>
+                    <p class="text-secondary">Current Volume Tier Check: Active</p>
+                </div>
+            {% endif %}
+
+            {% if role == 'WHOLESALE' and not can_checkout %}
+                <div style="color: var(--accent-neon); margin-bottom: 1.5rem; padding: 1rem; border: 1px solid var(--accent-neon); border-radius: 4px; background: rgba(255,51,102,0.05);">
+                    <strong>Action Required:</strong> {{ moq_warning }}
+                </div>
+                <button class="btn btn-primary" style="width: 100%; opacity: 0.5; cursor: not-allowed;" disabled>Proceed to Checkout</button>
+            {% else %}
+                <a href="#" class="btn btn-primary" style="width: 100%; text-align: center;">Proceed to Checkout</a>
+            {% endif %}
+            
+            <div style="text-align: center; margin-top: 1rem;">
+                <a href="{% url 'clear_cart' %}" class="text-secondary" style="font-size: 0.9rem; text-decoration: underline;">Clear Cart</a>
+            </div>
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 4rem; background: var(--bg-surface); border-radius: 8px; border: 1px solid var(--border-color);">
+            <p class="text-secondary" style="font-size: 1.25rem; margin-bottom: 2rem;">Your cart is currently empty.</p>
+            <a href="{% url 'storefront' %}" class="btn btn-primary">Continue Shopping</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
